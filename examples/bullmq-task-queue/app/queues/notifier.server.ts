@@ -3,19 +3,24 @@ import { Queue, Worker, QueueScheduler } from "bullmq";
 import { redis } from "~/utils/redis.server";
 
 declare global {
-  var __notifierQueue: Queue | undefined;
-  var __notifierWorker: Worker | undefined;
+  var __notifierQueue: Queue<QueueData> | undefined;
+  var __notifierWorker: Worker<QueueData> | undefined;
   var __notifierScheduler: QueueScheduler | undefined;
 }
 
 const QUEUE_NAME = "notifier";
 
 type QueueData = {
+  emailType: 'UserRegistration' | 'PasswordReset';
   emailAddress: string;
-};
+} | {
+  emailType: 'OrderConfirmation';
+  emailAddress: string;
+  orderId: string;
+}
 
 // Bullmq queues are the storage container managing jobs.
-export const queue: Queue =
+export const queue =
   global.__notifierQueue ||
   (global.__notifierQueue = new Queue<QueueData>(QUEUE_NAME, {
     connection: redis
