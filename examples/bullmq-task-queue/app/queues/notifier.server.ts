@@ -30,8 +30,7 @@ export const queue =
 // They reach out to our redis connection and pull jobs off the queue
 // in an order determined by factors such as job priority, delay, etc.
 // The scheduler plays an important role in helping workers stay busy.
-const worker: Worker =
-  global.__notifierWorker ||
+global.__notifierWorker = global.__notifierWorker ||
   (global.__notifierWorker = new Worker<QueueData>(
     QUEUE_NAME,
     async job => {
@@ -50,8 +49,7 @@ const worker: Worker =
 // Schedulers are used to move tasks between states within the queue.
 // Jobs may be queued in a delayed or waiting state, but the scheduler's
 // job is to eventually move them to an active state.
-const scheduler: QueueScheduler =
-  global.__notifierScheduler ||
+global.__notifierScheduler = global.__notifierScheduler ||
   (global.__notifierScheduler = new QueueScheduler(QUEUE_NAME, {
     connection: redis
   }));
